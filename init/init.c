@@ -1019,6 +1019,36 @@ static void selinux_initialize(void)
     security_setenforce(is_enforcing);
 }
 
+static void rk_parse_cpu(void)
+{
+    int fd;
+    char buf[64];
+
+    fd = open("/sys/devices/system/cpu/type", O_RDONLY);
+    if (fd >= 0) {
+        int n = read(fd, buf, sizeof(buf) - 1);
+        if (n > 0) {
+            if (buf[n-1] == '\n')
+                n--;
+            buf[n] = 0;
+            property_set("ro.rk.cpu", buf);
+        }
+        close(fd);
+    }
+
+    fd = open("/sys/devices/system/cpu/soc", O_RDONLY);
+    if (fd >= 0) {
+        int n = read(fd, buf, sizeof(buf) - 1);
+        if (n > 0) {
+            if (buf[n-1] == '\n')
+                n--;
+            buf[n] = 0;
+            property_set("ro.rk.soc", buf);
+        }
+        close(fd);
+    }
+}
+
 int main(int argc, char **argv)
 {
     int fd_count = 0;
@@ -1067,6 +1097,8 @@ int main(int argc, char **argv)
     open_devnull_stdio();
     klog_init();
     property_init();
+
+    rk_parse_cpu();
 
     get_hardware_name(hardware, &revision);
 
