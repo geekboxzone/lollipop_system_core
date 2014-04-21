@@ -31,6 +31,10 @@ endif
 # Enable ueventd logging
 #LOCAL_CFLAGS += -DLOG_UEVENTS=1
 
+ifeq ($(strip $(TARGET_BOARD_PLATFORM)), rk3288)
+LOCAL_CFLAGS += -DTARGET_BOARD_PLATFORM_RK3288
+endif
+
 LOCAL_MODULE:= init
 
 LOCAL_FORCE_STATIC_EXECUTABLE := true
