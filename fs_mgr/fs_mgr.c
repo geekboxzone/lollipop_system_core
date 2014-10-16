@@ -49,6 +49,7 @@
 #define E2FSCK_BIN      "/system/bin/e2fsck"
 #define F2FS_FSCK_BIN  "/system/bin/fsck.f2fs"
 #define MKSWAP_BIN      "/system/bin/mkswap"
+#define RESIZE2FS_BIN   "/sbin/resize2fs"
 
 #define FSCK_LOG_FILE   "/dev/fscklogs/log"
 
@@ -84,6 +85,35 @@ static int wait_for_file(const char *filename, int timeout)
         usleep(10000);
 
     return ret;
+}
+
+static void resize_fs(char *blk_device, char *fs_type)
+{
+    pid_t pid;
+    int status;
+    int err;
+    char *resize2fs_argv[3] = {
+        RESIZE2FS_BIN,
+        blk_device,
+        NULL
+    };
+
+    if (!strcmp(fs_type, "ext2") || !strcmp(fs_type, "ext3") || !strcmp(fs_type, "ext4")) {
+        if (access(RESIZE2FS_BIN, X_OK)) {
+            INFO("Not running %s on %s (executable not in system image)\n",
+                 RESIZE2FS_BIN, blk_dev);
+        } else {
+            INFO("Running %s on %s\n", RESIZE2FS_BIN, blk_device);
+            err = android_fork_execvp_ext(ARRAY_SIZE(resize2fs_argv), resize2fs_argv,
+                                      &status, true, LOG_KLOG, false, NULL);
+            if (err < 0) {
+                /* No need to check for error in fork, we can't really handle it now */
+                ERROR("Failed trying to run %s\n", RESIZE2FS_BIN);
+            }
+        }
+    }
+
+    return;
 }
 
 static void check_fs(char *blk_device, char *fs_type, char *target)
@@ -350,6 +380,15 @@ int fs_mgr_mount_all(struct fstab *fstab)
             wait_for_file(fstab->recs[i].blk_device, WAIT_TIMEOUT);
         }
 
+        if (fstab->recs[i].fs_mgr_flags & MF_RESIZE) {
+            resize_fs(fstab->recs[i].blk_device, fstab->recs[i].fs_type);
+        }
+
+        if (fstab->recs[i].fs_mgr_flags & MF_CHECK) {
+            check_fs(n_blk_device, fstab->recs[i].fs_type,
+                     fstab->recs[i].mount_point);
+        }
+
         if ((fstab->recs[i].fs_mgr_flags & MF_VERIFY) &&
             !device_is_debuggable()) {
             if (fs_mgr_setup_verity(&fstab->recs[i]) < 0) {
@@ -460,6 +499,10 @@ int fs_mgr_do_mount(struct fstab *fstab, char *n_name, char *n_blk_device,
         /* First check the filesystem if requested */
         if (fstab->recs[i].fs_mgr_flags & MF_WAIT) {
             wait_for_file(n_blk_device, WAIT_TIMEOUT);
+        }
+
+        if (fstab->recs[i].fs_mgr_flags & MF_RESIZE) {
+            resize_fs(fstab->recs[i].blk_device, fstab->recs[i].fs_type);
         }
 
         if (fstab->recs[i].fs_mgr_flags & MF_CHECK) {
