@@ -105,7 +105,11 @@ int main(int argc, char **argv)
     char *cmdline = "";
     char *bootimg = 0;
     char *board = "";
+#if TARGET_ROCHCHIP_RECOVERY == true
+    unsigned pagesize = 16384;
+#else
     unsigned pagesize = 2048;
+#endif
     int fd;
     SHA_CTX ctx;
     const uint8_t* sha;
@@ -120,6 +124,13 @@ int main(int argc, char **argv)
     argv++;
 
     memset(&hdr, 0, sizeof(hdr));
+
+#if TARGET_ROCHCHIP_RECOVERY == true
+    base           = 0x60000000;
+    kernel_offset  = 0x00408000;
+    ramdisk_offset = 0x02000000;
+    tags_offset    = 0x00088000;
+#endif
 
     while(argc > 0){
         char *arg = argv[0];
@@ -242,6 +253,13 @@ int main(int argc, char **argv)
     SHA_update(&ctx, &hdr.ramdisk_size, sizeof(hdr.ramdisk_size));
     SHA_update(&ctx, second_data, hdr.second_size);
     SHA_update(&ctx, &hdr.second_size, sizeof(hdr.second_size));
+#if TARGET_ROCHCHIP_RECOVERY == true
+    SHA_update(&ctx, &hdr.tags_addr, sizeof(hdr.tags_addr));
+    SHA_update(&ctx, &hdr.page_size, sizeof(hdr.page_size));
+    SHA_update(&ctx, &hdr.unused, sizeof(hdr.unused));
+    SHA_update(&ctx, &hdr.name, sizeof(hdr.name));
+    SHA_update(&ctx, &hdr.cmdline, sizeof(hdr.cmdline));
+#endif
     sha = SHA_final(&ctx);
     memcpy(hdr.id, sha,
            SHA_DIGEST_SIZE > sizeof(hdr.id) ? sizeof(hdr.id) : SHA_DIGEST_SIZE);
