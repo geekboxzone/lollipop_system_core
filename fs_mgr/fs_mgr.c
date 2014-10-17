@@ -101,7 +101,7 @@ static void resize_fs(char *blk_device, char *fs_type)
     if (!strcmp(fs_type, "ext2") || !strcmp(fs_type, "ext3") || !strcmp(fs_type, "ext4")) {
         if (access(RESIZE2FS_BIN, X_OK)) {
             INFO("Not running %s on %s (executable not in system image)\n",
-                 RESIZE2FS_BIN, blk_dev);
+                 RESIZE2FS_BIN, blk_device);
         } else {
             INFO("Running %s on %s\n", RESIZE2FS_BIN, blk_device);
             err = android_fork_execvp_ext(ARRAY_SIZE(resize2fs_argv), resize2fs_argv,
@@ -382,11 +382,6 @@ int fs_mgr_mount_all(struct fstab *fstab)
 
         if (fstab->recs[i].fs_mgr_flags & MF_RESIZE) {
             resize_fs(fstab->recs[i].blk_device, fstab->recs[i].fs_type);
-        }
-
-        if (fstab->recs[i].fs_mgr_flags & MF_CHECK) {
-            check_fs(n_blk_device, fstab->recs[i].fs_type,
-                     fstab->recs[i].mount_point);
         }
 
         if ((fstab->recs[i].fs_mgr_flags & MF_VERIFY) &&
