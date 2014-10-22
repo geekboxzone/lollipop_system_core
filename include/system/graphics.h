@@ -318,6 +318,11 @@ enum {
     HAL_PIXEL_FORMAT_YCbCr_422_SP       = 0x10, // NV16
     HAL_PIXEL_FORMAT_YCrCb_420_SP       = 0x11, // NV21
     HAL_PIXEL_FORMAT_YCbCr_422_I        = 0x14, // YUY2
+    HAL_PIXEL_FORMAT_YCrCb_NV12         = 0x15, // YUY2
+    HAL_PIXEL_FORMAT_YCrCb_NV12_VIDEO   = 0x16,
+    HAL_PIXEL_FORMAT_YCrCb_NV12_10      = 0x17, // YUY2_1obit
+    HAL_PIXEL_FORMAT_YCbCr_422_SP_10    = 0x18, // 
+    HAL_PIXEL_FORMAT_YCrCb_420_SP_10    = 0x19, //
 };
 
 /*
