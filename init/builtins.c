@@ -31,6 +31,7 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <linux/loop.h>
+#include <sys/utsname.h>
 #include <cutils/partition_utils.h>
 #include <cutils/android_reboot.h>
 #include <fs_mgr.h>
@@ -134,10 +135,24 @@ static int _chmod(const char *path, mode_t mode)
 
 static int insmod(const char *filename, char *options)
 {
-    void *module;
+    void *module = NULL;
     unsigned size;
     int ret;
+    
+    struct utsname name;
+    char filename_release[PATH_MAX];
 
+    memset(&name, 0, sizeof(name));
+    ret = uname(&name);
+    if (ret == 0 && name.release) {
+        /* try insmod filename.x.x.x */
+        memset(filename_release, 0, sizeof(filename_release));
+        strncat(filename_release, filename, sizeof(filename_release) - 1);
+        strncat(filename_release, ".", sizeof(filename_release) - 1);
+        strncat(filename_release, name.release, sizeof(filename_release) - 1);
+        module = read_file(filename_release, &size);
+    }
+    if (!module)
     module = read_file(filename, &size);
     if (!module)
         return -1;
