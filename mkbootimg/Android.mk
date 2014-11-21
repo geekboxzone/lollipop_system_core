@@ -8,7 +8,12 @@ LOCAL_CFLAGS := -Werror
 
 LOCAL_MODULE := mkbootimg
 
+ifneq ($(TARGET_ARCH),x86)
 LOCAL_CFLAGS := -DTARGET_ROCHCHIP_RECOVERY=true
+else
+LOCAL_CFLAGS := -DTARGET_ROCHCHIP_RECOVERY=false
+endif
+
 include $(BUILD_HOST_EXECUTABLE)
 
 $(call dist-for-goals,dist_files,$(LOCAL_BUILT_MODULE))
