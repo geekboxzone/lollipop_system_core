@@ -95,6 +95,7 @@ struct sysmeminfo {
     int nr_file_pages;
     int nr_shmem;
     int totalreserve_pages;
+    int nr_free_cma;
 };
 
 struct adjslot_list {
@@ -461,6 +462,11 @@ static void zoneinfo_parse_line(char *line, struct sysmeminfo *mip) {
     if (!cp)
         return;
 
+    if (!strcmp(cp, "protection:")) {
+        mip->totalreserve_pages += zoneinfo_parse_protection(save_ptr);
+        return;
+    }
+
     ap = strtok_r(NULL, " ", &save_ptr);
     if (!ap)
         return;
@@ -473,8 +479,8 @@ static void zoneinfo_parse_line(char *line, struct sysmeminfo *mip) {
         mip->nr_shmem += strtol(ap, NULL, 0);
     else if (!strcmp(cp, "high"))
         mip->totalreserve_pages += strtol(ap, NULL, 0);
-    else if (!strcmp(cp, "protection:"))
-        mip->totalreserve_pages += zoneinfo_parse_protection(ap);
+    else if (!strcmp(cp, "nr_free_cma"))
+        mip->nr_free_cma += strtol(ap, NULL, 0);
 }
 
 static int zoneinfo_parse(struct sysmeminfo *mip) {
@@ -665,7 +671,7 @@ static void mp_event(uint32_t events __unused) {
         find_and_kill_process(0, 0, true);
     }
 
-    other_free = mi.nr_free_pages - mi.totalreserve_pages;
+    other_free = mi.nr_free_pages - mi.totalreserve_pages - mi.nr_free_cma;
     other_file = mi.nr_file_pages - mi.nr_shmem;
 
     do {
