@@ -27,7 +27,7 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 
-#include <ion/rockchip_ion.h>
+#include <ion/sofia_ion.h>
 #include <ion/ion.h>
 
 int ion_open()
