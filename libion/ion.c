@@ -27,7 +27,11 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 
+#if TARGET_ROCHCHIP_ION == true
+#include <ion/rockchip_ion.h>
+#else
 #include <ion/sofia_ion.h>
+#endif
 #include <ion/ion.h>
 
 int ion_open()
