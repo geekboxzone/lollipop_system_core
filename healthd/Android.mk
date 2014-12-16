@@ -17,7 +17,8 @@ LOCAL_SRC_FILES := \
 	healthd_mode_android.cpp \
 	healthd_mode_charger.cpp \
 	BatteryMonitor.cpp \
-	BatteryPropertiesRegistrar.cpp
+	BatteryPropertiesRegistrar.cpp \
+	bat_cap.cpp
 
 LOCAL_MODULE := healthd
 LOCAL_MODULE_TAGS := optional
