@@ -28,7 +28,7 @@
 #include <sys/types.h>
 
 #if TARGET_ROCHCHIP_ION == true
-#include <ion/rockchip_ion.h>
+#include <linux/rockchip_ion.h>
 #else
 #include <ion/sofia_ion.h>
 #endif
@@ -177,4 +177,24 @@ int ion_sync_fd(int fd, int handle_fd)
         .fd = handle_fd,
     };
     return ion_ioctl(fd, ION_IOC_SYNC, &data);
+}
+
+int ion_get_phys(int fd, ion_user_handle_t handle, unsigned long *phys)
+{
+    struct ion_phys_data phys_data;
+    struct ion_custom_data data;
+
+    phys_data.handle = handle;
+    phys_data.phys = 0;
+
+    data.cmd = ION_IOC_GET_PHYS;
+    data.arg = (unsigned long)&phys_data;
+
+    int ret = ion_ioctl(fd, ION_IOC_CUSTOM, &data);
+    if (ret<0)
+        return ret;
+
+    *phys = phys_data.phys;
+
+    return 0;
 }
