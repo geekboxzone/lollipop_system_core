@@ -194,8 +194,8 @@ enum {
      *    - GRALLOC_USAGE_SW_*
      *    - GRALLOC_USAGE_RENDERSCRIPT
      */
-    HAL_PIXEL_FORMAT_RAW16 = 0x30,
-    HAL_PIXEL_FORMAT_RAW_SENSOR = 0x30, // TODO(rubenbrunk): Remove RAW_SENSOR.
+    HAL_PIXEL_FORMAT_RAW16 = 0x20,
+    HAL_PIXEL_FORMAT_RAW_SENSOR = 0x20, // TODO(rubenbrunk): Remove RAW_SENSOR.
 
     /*
      * Android RAW10 format:
@@ -245,7 +245,7 @@ enum {
      *    - GRALLOC_USAGE_SW_*
      *    - GRALLOC_USAGE_RENDERSCRIPT
      */
-    HAL_PIXEL_FORMAT_RAW10 = 0x35,
+    HAL_PIXEL_FORMAT_RAW10 = 0x25,
 
     /*
      * Android opaque RAW format:
@@ -262,7 +262,7 @@ enum {
      *    - GRALLOC_USAGE_SW_*
      *    - GRALLOC_USAGE_RENDERSCRIPT
      */
-    HAL_PIXEL_FORMAT_RAW_OPAQUE = 0x34,
+    HAL_PIXEL_FORMAT_RAW_OPAQUE = 0x24,
 
     /*
      * Android binary blob graphics buffer format:
@@ -277,7 +277,7 @@ enum {
      * Buffers of this format must have a height of 1, and width equal to their
      * size in bytes.
      */
-    HAL_PIXEL_FORMAT_BLOB = 0x31,
+    HAL_PIXEL_FORMAT_BLOB = 0x21,
 
     /*
      * Android format indicating that the choice of format is entirely up to the
@@ -293,7 +293,7 @@ enum {
      * alpha value of 1.0 (i.e. the buffer contains only opaque pixel values).
      *
      */
-    HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED = 0x32,
+    HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED = 0x22,
 
     /*
      * Android flexible YCbCr formats
@@ -312,17 +312,17 @@ enum {
      * This format is locked for use by gralloc's (*lock_ycbcr) method, and
      * locking with the (*lock) method will return an error.
      */
-    HAL_PIXEL_FORMAT_YCbCr_420_888 = 0x33,
+    HAL_PIXEL_FORMAT_YCbCr_420_888 = 0x23,
 
     /* Legacy formats (deprecated), used by ImageFormat.java */
     HAL_PIXEL_FORMAT_YCbCr_422_SP       = 0x10, // NV16
     HAL_PIXEL_FORMAT_YCrCb_420_SP       = 0x11, // NV21
     HAL_PIXEL_FORMAT_YCbCr_422_I        = 0x14, // YUY2
-    HAL_PIXEL_FORMAT_YCrCb_NV12         = 0x20, // YUY2
-    HAL_PIXEL_FORMAT_YCrCb_NV12_VIDEO   = 0x21,
-    HAL_PIXEL_FORMAT_YCrCb_NV12_10      = 0x22, // YUY2_1obit
-    HAL_PIXEL_FORMAT_YCbCr_422_SP_10    = 0x23, // 
-    HAL_PIXEL_FORMAT_YCrCb_420_SP_10    = 0x24, //
+    HAL_PIXEL_FORMAT_YCrCb_NV12         = 0x15, // YUY2
+    HAL_PIXEL_FORMAT_YCrCb_NV12_VIDEO   = 0x16,
+    HAL_PIXEL_FORMAT_YCrCb_NV12_10      = 0x17, // YUY2_1obit
+    HAL_PIXEL_FORMAT_YCbCr_422_SP_10    = 0x18, // 
+    HAL_PIXEL_FORMAT_YCrCb_420_SP_10    = 0x19, //
 };
 
 /*
