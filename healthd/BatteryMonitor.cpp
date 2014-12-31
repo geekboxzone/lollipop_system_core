@@ -248,7 +248,6 @@ bool BatteryMonitor::update(void) {
         char dmesgline[256];
 
         if (props.batteryPresent) {
-	    /*
             snprintf(dmesgline, sizeof(dmesgline),
                  "battery l=%d v=%d t=%s%d.%d h=%d st=%d",
                  props.batteryLevel, props.batteryVoltage,
@@ -256,7 +255,6 @@ bool BatteryMonitor::update(void) {
                  abs(props.batteryTemperature / 10),
                  abs(props.batteryTemperature % 10), props.batteryHealth,
                  props.batteryStatus);
-	    */
 
             if (!mHealthdConfig->batteryCurrentNowPath.isEmpty()) {
                 int c = getIntField(mHealthdConfig->batteryCurrentNowPath);
