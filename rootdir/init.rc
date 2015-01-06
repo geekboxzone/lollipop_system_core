@@ -516,13 +516,6 @@ service lmkd /system/bin/lmkd
     critical
     socket lmkd seqpacket 0660 system system
 
-#Rogue
-service pvrsrvctl /system/vendor/bin/pvrsrvctl --start
-    oneshot
-    class core
-    user root
-    group root
-
 service servicemanager /system/bin/servicemanager
     class core
     user system
