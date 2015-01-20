@@ -1173,8 +1173,6 @@ int main(int argc, char **argv)
 	init_parse_config_file("/init.ptest.rc");
     else
 	init_parse_config_file("/init.rc");
-	//init_parse_config_file("/init.ptest.rc");
-    //init_parse_config_file("/init.rc");
 
     action_for_each_trigger("early-init", action_add_queue_tail);
 
