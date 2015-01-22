@@ -105,7 +105,7 @@ int main(int argc, char **argv)
     char *cmdline = "";
     char *bootimg = 0;
     char *board = "";
-#if TARGET_ROCHCHIP_RECOVERY == true
+#if TARGET_ROCKCHIP_RECOVERY == true
     unsigned pagesize = 16384;
 #else
     unsigned pagesize = 2048;
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 
     memset(&hdr, 0, sizeof(hdr));
 
-#if TARGET_ROCHCHIP_RECOVERY == true
+#if TARGET_ROCKCHIP_RECOVERY == true
     base           = 0x60000000;
     kernel_offset  = 0x00408000;
     ramdisk_offset = 0x02000000;
@@ -253,7 +253,7 @@ int main(int argc, char **argv)
     SHA_update(&ctx, &hdr.ramdisk_size, sizeof(hdr.ramdisk_size));
     SHA_update(&ctx, second_data, hdr.second_size);
     SHA_update(&ctx, &hdr.second_size, sizeof(hdr.second_size));
-#if TARGET_ROCHCHIP_RECOVERY == true
+#if TARGET_ROCKCHIP_RECOVERY == true
     SHA_update(&ctx, &hdr.tags_addr, sizeof(hdr.tags_addr));
     SHA_update(&ctx, &hdr.page_size, sizeof(hdr.page_size));
     SHA_update(&ctx, &hdr.unused, sizeof(hdr.unused));
