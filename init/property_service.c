@@ -145,6 +145,12 @@ static int check_perms(const char *name, char *sctx)
     int i;
     unsigned int app_id;
 
+    //add by yhx to let TestCase set this property for CTS
+    if(strcmp("sys.cts.capture",name)==0)
+    {
+        return 1;
+    }
+
     if(!strncmp(name, "ro.", 3))
         name +=3;
 
