@@ -74,6 +74,11 @@ int put_old_cap(int bat_cap)
     }
 
     if ((s_old_capacity != bat_cap) && (bat_cap >= 0 && bat_cap <= 100)) {
+
+        if (s_old_capacity == -1) {                        
+                s_old_capacity = bat_cap;
+                return 0;
+        }
         
         LOGI("rk set new_capacity; new_capacity = %d, old_capacity = %d\n", bat_cap, s_old_capacity);
         s_old_capacity = bat_cap;
