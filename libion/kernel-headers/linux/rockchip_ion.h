@@ -1,6 +1,6 @@
 /*
- *
- * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2014 Meiyou.chen <cmy@rock-chips.com>
+ * Copyright (C) 2014 ROCKCHIP, Inc.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -28,10 +28,10 @@
  * ion_heap_ids order by ion_heap_type
  */
 enum ion_heap_ids {
-       ION_VMALLOC_HEAP_ID = 0,
-       ION_CARVEOUT_HEAP_ID = 2,
-       ION_CMA_HEAP_ID = 4,
-       ION_DRM_HEAP_ID = 5,
+	ION_VMALLOC_HEAP_ID = 0,
+	ION_CARVEOUT_HEAP_ID = 2,
+	ION_CMA_HEAP_ID = 4,
+	ION_DRM_HEAP_ID = 5,
 };
 
 #define ION_HEAP(bit) (1 << (bit))
@@ -40,6 +40,12 @@ struct ion_phys_data {
 	ion_user_handle_t handle;
 	unsigned long phys;
 	unsigned long size;
+};
+
+enum {
+	SOFIA_ION_GET_PARAM = 0,
+	SOFIA_ION_SECURE_ALLOC,
+	SOFIA_ION_SECURE_FREE,
 };
 
 #define ION_IOC_ROCKCHIP_MAGIC 'R'
