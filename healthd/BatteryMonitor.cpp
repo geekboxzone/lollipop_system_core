@@ -32,7 +32,6 @@
 #include <utils/Errors.h>
 #include <utils/String8.h>
 #include <utils/Vector.h>
-#include "bat_cap.h"
 
 #define POWER_SUPPLY_SUBSYSTEM "power_supply"
 #define POWER_SUPPLY_SYSFS_PATH "/sys/class/" POWER_SUPPLY_SUBSYSTEM
@@ -196,8 +195,6 @@ bool BatteryMonitor::update(void) {
     props.batteryTemperature = mBatteryFixedTemperature ?
         mBatteryFixedTemperature :
         getIntField(mHealthdConfig->batteryTemperaturePath);
-
-    put_old_cap(props.batteryLevel);
 
     const int SIZE = 128;
     char buf[SIZE];
@@ -540,7 +537,6 @@ void BatteryMonitor::init(struct healthd_config *hc) {
         mBatteryFixedCapacity = FAKE_BATTERY_CAPACITY;
         mBatteryFixedTemperature = FAKE_BATTERY_TEMPERATURE;
     }
-    load_old_cap();
 }
 
 }; // namespace android
