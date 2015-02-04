@@ -194,3 +194,36 @@ int ion_get_phys(int fd, ion_user_handle_t handle, unsigned long *phys)
 
     return 0;
 }
+
+int ion_secure_free(int fd, size_t len, unsigned long phys)
+{
+    struct ion_phys_data phys_data;
+    struct ion_custom_data data;
+
+    phys_data.phys = phys;
+    phys_data.size = len;
+
+    data.cmd = SOFIA_ION_SECURE_FREE;
+    data.arg = (unsigned long)&phys_data;
+
+    return ion_ioctl(fd, ION_IOC_CUSTOM, &data);
+}
+
+int ion_secure_alloc(int fd, size_t len, unsigned long *phys)
+{
+    struct ion_phys_data phys_data;
+    struct ion_custom_data data;
+
+    phys_data.phys = 0;
+    phys_data.size = len;
+
+    data.cmd = SOFIA_ION_SECURE_ALLOC;
+    data.arg = (unsigned long)&phys_data;
+
+    int ret = ion_ioctl(fd, ION_IOC_CUSTOM, &data);
+    if (ret<0)
+        return ret;
+
+    *phys = phys_data.phys;
+    return ret;
+}
