@@ -551,7 +551,7 @@ typedef enum log_id {
     LOG_ID_EVENTS = 2,
     LOG_ID_SYSTEM = 3,
     LOG_ID_CRASH = 4,
-
+    LOG_ID_KERNEL = 5,
     LOG_ID_MAX
 } log_id_t;
 #define sizeof_log_id_t sizeof(typeof_log_id_t)
