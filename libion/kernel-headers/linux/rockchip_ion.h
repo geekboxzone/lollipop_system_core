@@ -32,6 +32,7 @@ enum ion_heap_ids {
 	ION_CARVEOUT_HEAP_ID = 2,
 	ION_CMA_HEAP_ID = 4,
 	ION_DRM_HEAP_ID = 5,
+	ION_SECURE_HEAP_ID = 6,
 };
 
 #define ION_HEAP(bit) (1 << (bit))
