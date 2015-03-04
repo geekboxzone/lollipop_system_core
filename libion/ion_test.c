@@ -70,13 +70,19 @@ void ion_alloc_test()
     printf("ion alloc test: passed\n");
 }
 
-int _ion_secure_alloc_test(int *fd, size_t len, unsigned long *phys)
+int _ion_secure_alloc_test(int *fd, size_t len, unsigned long *phys,
+                           ion_user_handle_t *handle)
 {
     int ret;
 
     *fd = ion_open();
     if (*fd < 0)
         return *fd;
+
+    heap_mask |=  5; //ION_HEAP_TYPE_SECURE = 5
+    ret = ion_alloc(*fd, len, align, heap_mask, alloc_flags, handle);
+    if (ret)
+        printf("%s failed: %s\n", __func__, strerror(ret));
 
     ret = ion_secure_alloc(*fd, len, phys);
     if (ret)
@@ -89,8 +95,9 @@ void ion_secure_alloc_test()
 {
     int fd, ret;
     unsigned long phys;
+    ion_user_handle_t handle;
 
-    if(_ion_secure_alloc_test(&fd, 4096, &phys))
+    if(_ion_secure_alloc_test(&fd, 4096, &phys, &handle))
         return;
 
     ret = ion_secure_free(fd, 4096, phys);
@@ -98,6 +105,13 @@ void ion_secure_alloc_test()
         printf("%s failed: %s 0x%lx\n", __func__, strerror(ret), phys);
         return;
     }
+
+    ret = ion_free(fd, handle);
+    if (ret) {
+        printf("%s failed: %s %d\n", __func__, strerror(ret), handle);
+        return;
+    }
+
     ion_close(fd);
     printf("ion secure alloc test: passed\n");
     return;
