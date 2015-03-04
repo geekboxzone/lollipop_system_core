@@ -42,12 +42,6 @@ struct ion_phys_data {
 	unsigned long size;
 };
 
-enum {
-	SOFIA_ION_GET_PARAM = 0,
-	SOFIA_ION_SECURE_ALLOC,
-	SOFIA_ION_SECURE_FREE,
-};
-
 #define ION_IOC_ROCKCHIP_MAGIC 'R'
 
 /**
@@ -55,5 +49,13 @@ enum {
  */
 #define ION_IOC_GET_PHYS	_IOWR(ION_IOC_ROCKCHIP_MAGIC, 0, \
 						struct ion_phys_data)
+
+/* Alloc secure region. */
+#define ION_IOC_ALLOC_SECURE	_IOWR(ION_IOC_ROCKCHIP_MAGIC, 1, \
+				struct ion_phys_data)
+
+/* Free secure region alloced. */
+#define ION_IOC_FREE_SECURE	_IOWR(ION_IOC_ROCKCHIP_MAGIC, 2, \
+				struct ion_phys_data)
 
 #endif
