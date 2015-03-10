@@ -200,6 +200,7 @@ int ion_secure_free(int fd, size_t len, unsigned long phys)
     struct ion_phys_data phys_data;
     struct ion_custom_data data;
 
+    phys_data.handle = 0;
     phys_data.phys = phys;
     phys_data.size = len;
 
@@ -214,7 +215,7 @@ int ion_secure_alloc(int fd, size_t len, unsigned long *phys)
     struct ion_phys_data phys_data;
     struct ion_custom_data data;
 
-    phys_data.phys = 0;
+    phys_data.handle = 0;
     phys_data.size = len;
 
     data.cmd = ION_IOC_ALLOC_SECURE;
