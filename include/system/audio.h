@@ -66,14 +66,7 @@ typedef enum {
     AUDIO_STREAM_REROUTING        = 11, /* For dynamic policy output mixes */
     AUDIO_STREAM_PATCH            = 12, /* For internal audio flinger tracks. Fixed volume */
     AUDIO_STREAM_PUBLIC_CNT       = AUDIO_STREAM_TTS + 1,
-#ifdef SOFIA_FMR
-    // PEKALL FMR begin:
-    FM                            = 13,
-    AUDIO_STREAM_CNT,
-    // PEKALL FMR end
-#else
     AUDIO_STREAM_CNT              = AUDIO_STREAM_PATCH + 1,
-#endif//SOFIA_FMR
 } audio_stream_type_t;
 
 /* Do not change these values without updating their counterparts
@@ -147,11 +140,9 @@ typedef enum {
                                           /* An example of remote presentation is Wifi Display */
                                           /*  where a dongle attached to a TV can be used to   */
                                           /*  play the mix captured by this audio source.      */
-#ifdef SOFIA_FMR
     // PEKALL FMR begin:
     AUDIO_SOURCE_FM_RX              = 9,  // FM recording
     // PEKALL FMR end
-#endif// SOFIA_FMR
     AUDIO_SOURCE_CNT,
     AUDIO_SOURCE_MAX                 = AUDIO_SOURCE_CNT - 1,
     AUDIO_SOURCE_FM_TUNER            = 1998,
@@ -608,7 +599,7 @@ enum {
     AUDIO_DEVICE_OUT_AUX_LINE                  = 0x200000,
     /* limited-output speaker device for acoustic safety */
     AUDIO_DEVICE_OUT_SPEAKER_SAFE              = 0x400000,
-#ifdef SOFIA_FMR
+
    // PEKALL FMR begin:
     AUDIO_DEVICE_OUT_FM_HEADSET                =
         (AUDIO_DEVICE_OUT_FM | AUDIO_DEVICE_OUT_WIRED_HEADSET),
@@ -616,7 +607,7 @@ enum {
         (AUDIO_DEVICE_OUT_FM | AUDIO_DEVICE_OUT_WIRED_HEADPHONE),
     AUDIO_DEVICE_OUT_FM_SPEAKER                = (AUDIO_DEVICE_OUT_FM | AUDIO_DEVICE_OUT_SPEAKER),
     // PEKALL FMR end
-#endif //SOFIA_FMR
+
     AUDIO_DEVICE_OUT_DEFAULT                   = AUDIO_DEVICE_BIT_DEFAULT,
     AUDIO_DEVICE_OUT_ALL      = (AUDIO_DEVICE_OUT_EARPIECE |
                                  AUDIO_DEVICE_OUT_SPEAKER |
@@ -641,7 +632,11 @@ enum {
                                  AUDIO_DEVICE_OUT_FM |
                                  AUDIO_DEVICE_OUT_AUX_LINE |
                                  AUDIO_DEVICE_OUT_SPEAKER_SAFE |
-                                 AUDIO_DEVICE_OUT_DEFAULT),
+                                 AUDIO_DEVICE_OUT_DEFAULT
+                                 // PEKALL FMR begin:
+                                 | AUDIO_DEVICE_OUT_FM
+                                 // PEKALL FMR end
+                                 ),
     AUDIO_DEVICE_OUT_ALL_A2DP = (AUDIO_DEVICE_OUT_BLUETOOTH_A2DP |
                                  AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES |
                                  AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER),
@@ -669,12 +664,7 @@ enum {
     AUDIO_DEVICE_IN_USB_ACCESSORY         = AUDIO_DEVICE_BIT_IN | 0x800,
     AUDIO_DEVICE_IN_USB_DEVICE            = AUDIO_DEVICE_BIT_IN | 0x1000,
     /* FM tuner input */
-    AUDIO_DEVICE_IN_FM_TUNER              = AUDIO_DEVICE_BIT_IN | 0x80000,
-#ifdef SOFIA_FMR
-    // PEKALL FMR begin:
-    AUDIO_DEVICE_IN_FM_RX                 = AUDIO_DEVICE_IN_FM_TUNER,
-    // PEKALL FMR end
-#endif //SOFIA_FMR
+    AUDIO_DEVICE_IN_FM_TUNER              = AUDIO_DEVICE_BIT_IN | 0x2000,
     /* TV tuner input */
     AUDIO_DEVICE_IN_TV_TUNER              = AUDIO_DEVICE_BIT_IN | 0x4000,
     /* Analog jack with line impedance detected */
@@ -683,6 +673,9 @@ enum {
     AUDIO_DEVICE_IN_SPDIF                 = AUDIO_DEVICE_BIT_IN | 0x10000,
     AUDIO_DEVICE_IN_BLUETOOTH_A2DP        = AUDIO_DEVICE_BIT_IN | 0x20000,
     AUDIO_DEVICE_IN_LOOPBACK              = AUDIO_DEVICE_BIT_IN | 0x40000,
+    // PEKALL FMR begin:
+    AUDIO_DEVICE_IN_FM_RX                 = AUDIO_DEVICE_BIT_IN | 0x80000,
+    // PEKALL FMR end
     
     AUDIO_DEVICE_IN_DEFAULT               = AUDIO_DEVICE_BIT_IN | AUDIO_DEVICE_BIT_DEFAULT,
 
@@ -706,11 +699,9 @@ enum {
                                AUDIO_DEVICE_IN_BLUETOOTH_A2DP |
                                AUDIO_DEVICE_IN_LOOPBACK |
                                AUDIO_DEVICE_IN_DEFAULT
-#ifdef SOFIA_FMR
                                // PEKALL FMR begin:
                                | AUDIO_DEVICE_IN_FM_RX
                                // PEKALL FMR end
-#endif //SOFIA_FMR
                                ),
     AUDIO_DEVICE_IN_ALL_SCO = AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
     AUDIO_DEVICE_IN_ALL_USB  = (AUDIO_DEVICE_IN_USB_ACCESSORY |
@@ -793,7 +784,7 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     has_video: false,
     is_streaming: false
 };
-#ifdef SOFIA_FMR
+
 // PEKALL FMR begin:
 static inline bool audio_is_fm_device(audio_devices_t device)
 {
@@ -803,7 +794,7 @@ static inline bool audio_is_fm_device(audio_devices_t device)
     return false;
 }
 // PEKALL FMR end
-#endif //SOFIA_FMR
+
 /* common audio stream configuration parameters
  * You should memset() the entire structure to zero before use to
  * ensure forward compatibility
@@ -1064,12 +1055,11 @@ typedef uint32_t audio_hw_sync_t;
 
 static inline bool audio_is_output_device(audio_devices_t device)
 {
-#ifdef SOFIA_FMR    
     // PEKALL FMR begin:
     if (audio_is_fm_device(device))
         return true;
     // PEKALL FMR end
-#endif //SOFIA_FMR
+
     if (((device & AUDIO_DEVICE_BIT_IN) == 0) &&
             (popcount(device) == 1) && ((device & ~AUDIO_DEVICE_OUT_ALL) == 0))
         return true;
@@ -1079,12 +1069,11 @@ static inline bool audio_is_output_device(audio_devices_t device)
 
 static inline bool audio_is_input_device(audio_devices_t device)
 {
-#ifdef SOFIA_FMR    
     // PEKALL FMR begin:
     if (device & AUDIO_DEVICE_IN_FM_RX)
         return true;
     // PEKALL FMR end
-#endif//SOFIA_FMR
+
     if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
         device &= ~AUDIO_DEVICE_BIT_IN;
         if ((popcount(device) == 1) && ((device & ~AUDIO_DEVICE_IN_ALL) == 0))
