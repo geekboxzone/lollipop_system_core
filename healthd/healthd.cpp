@@ -223,7 +223,8 @@ static void uevent_event(uint32_t /*epevents*/) {
     cp = msg;
 
     while (*cp) {
-        if (!strcmp(cp, "SUBSYSTEM=" POWER_SUPPLY_SUBSYSTEM)) {
+        if (!strcmp(cp, "SUBSYSTEM=" POWER_SUPPLY_SUBSYSTEM)
+            || strstr(cp, POWER_SUPPLY_SUBSYSTEM)) {
             healthd_battery_update();
             break;
         }
