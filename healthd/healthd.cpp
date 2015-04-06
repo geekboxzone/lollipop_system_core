@@ -20,6 +20,7 @@
 #include "healthd.h"
 #include "BatteryMonitor.h"
 
+#include <dirent.h>
 #include <errno.h>
 #include <libgen.h>
 #include <stdio.h>
@@ -235,6 +236,59 @@ static void uevent_event(uint32_t /*epevents*/) {
     }
 }
 
+/* force the kernel to regenerate the change events for the existing
+ * devices, if valid */
+static void do_coldboot(DIR *d, const char *event,
+                        bool follow_links, int max_depth)
+{
+    struct dirent *de;
+    int dfd, fd;
+
+    dfd = dirfd(d);
+
+    fd = openat(dfd, "uevent", O_WRONLY);
+    if (fd >= 0) {
+        write(fd, event, strlen(event));
+        close(fd);
+        //handle_uevent_fd(charger, charger->uevent_fd);
+    }
+
+    while ((de = readdir(d)) && max_depth > 0) {
+        DIR *d2;
+
+
+        if ((de->d_type != DT_DIR && !(de->d_type == DT_LNK && follow_links)) ||
+           de->d_name[0] == '.') {
+            continue;
+        }
+
+        fd = openat(dfd, de->d_name, O_RDONLY | O_DIRECTORY);
+        if (fd < 0) {
+            continue;
+        }
+
+        d2 = fdopendir(fd);
+        if (d2 == 0)
+            close(fd);
+        else {
+            do_coldboot(d2, event, follow_links, max_depth - 1);
+            closedir(d2);
+        }
+    }
+}
+
+static void coldboot(const char *path, const char *event)
+{
+    char str[256];
+
+    DIR *d = opendir(path);
+    if (d) {
+        snprintf(str, sizeof(str), "%s\n", event);
+        do_coldboot(d, str, true, 1);
+        closedir(d);
+    }
+}
+
 static void uevent_init(void) {
     uevent_fd = uevent_open_socket(64*1024, true);
 
@@ -320,6 +374,7 @@ static int healthd_init() {
     healthd_mode_ops->init(&healthd_config);
     wakealarm_init();
     uevent_init();
+    coldboot("/sys/class/power_supply", "add");
     gBatteryMonitor = new BatteryMonitor();
     gBatteryMonitor->init(&healthd_config);
     return 0;
