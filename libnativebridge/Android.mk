@@ -1,5 +1,7 @@
 LOCAL_PATH:= $(call my-dir)
-
+ifeq ($(WITH_NATIVE_BRIDGE), true)
+        LOCAL_CFLAGS += -DWITH_HOUDINI
+endif
 NATIVE_BRIDGE_COMMON_SRC_FILES := \
   native_bridge.cc
 
