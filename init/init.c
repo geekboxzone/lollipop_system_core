@@ -758,6 +758,29 @@ static void symlink_fstab()
     }
 }
 
+static void sysmlink_nand_emmc_fstab()
+{
+    char fstab_path[255] = "/fstab.";
+    char fstab_default_path[50] = "/fstab.";
+    int ret = -1;
+
+    strcat(fstab_path, hardware);
+
+    strcat(fstab_default_path, hardware);
+    FILE *fp;
+    if (!(fp = fopen("/proc/nand", "r"))) {
+        strcat(fstab_path,"_emmc");
+    }else{
+        strcat(fstab_path,"_nand");
+    }
+
+
+    ret = symlink(fstab_path, fstab_default_path);
+    if (ret < 0) {
+	ERROR("%s : failed", __func__);
+    }
+
+}
 static void export_kernel_boot_props(void)
 {
     char tmp[PROP_VALUE_MAX];
@@ -809,7 +832,9 @@ static void export_kernel_boot_props(void)
         property_set("ro.factorytest", "2");
     else
         property_set("ro.factorytest", "0");
-
+    #ifdef NAND_EMMC
+    sysmlink_nand_emmc_fstab();
+    #endif
     symlink_fstab();
 }
 
