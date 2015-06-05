@@ -43,8 +43,16 @@ int getprop_main(int argc, char *argv[])
             default_value = "";
         }
 
-        property_get(argv[1], value, default_value);
-        printf("%s\n", value);
+        if (!strcmp(argv[1], "ro.product.cpu.abi.bn")) {
+            printf("armeabi-v7a\n");
+        } else if (!strcmp(argv[1], "ro.product.cpu.abi2.bn")) {
+            printf("armeabi-v5a\n");
+        } else if (!strcmp(argv[1], "ro.product.cpu.abilist.bn")) {
+            printf("armeabi-v7a,armeabi-v5a,armeabi\n");
+        } else {
+            property_get(argv[1], value, default_value);
+            printf("%s\n", value);
+        }
     }
     return 0;
 }
