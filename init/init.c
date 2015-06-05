@@ -1046,7 +1046,7 @@ static void selinux_initialize(void)
     security_setenforce(is_enforcing);
 }
 
-static void rk_set_cpu(void)
+static void rk_312x_set_cpu(void)
 {
     int fd;
     char buf[128];
@@ -1061,6 +1061,47 @@ static void rk_set_cpu(void)
         if (n > 0) {
             buf[n-1] = '\0';
             //check whether 1.2G in the freqs table
+            if(strstr(buf,value)){
+                can_set_cpu = true;
+            }
+            // ERROR("available_frequencies %s \n",buf);
+        }
+        close(fd);
+    }else{
+        ERROR("error to open scaling_available_frequencies");
+    }
+
+
+    //first set write permission to root
+    chmod("/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq", 0644);
+    fd = open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq",O_RDWR);
+    if (fd >= 0) {
+        read(fd, min_freq, sizeof(min_freq) - 1);
+        if(can_set_cpu){
+            write(fd, value, strlen(value));
+        }//if(can_set_cpu)
+        close(fd);
+    }//if (fd >= 0)
+
+    property_set("ro.rk.cpu_min_freq", min_freq);
+}
+
+
+static void rk_3288_set_cpu(void)
+{
+    int fd;
+    char buf[128];
+    char value[16]={"1416000"};
+    char min_freq[16]={"126000"};//126M
+    bool can_set_cpu = false;
+
+    fd = open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies",O_RDONLY);
+
+    if (fd >= 0) {
+        int n = read(fd, buf, sizeof(buf) - 1);
+        if (n > 0) {
+            buf[n-1] = '\0';
+            //check whether 1.4G in the freqs table
             if(strstr(buf,value)){
                 can_set_cpu = true;
             }
@@ -1217,10 +1258,13 @@ int main(int argc, char **argv)
     klog_init();
     property_init();
 #ifdef TARGET_BOARD_PLATFORM_RK3288
-    rk_set_cpu();
+    rk_3288_set_cpu();
 #else
 #ifdef TARGET_BOARD_PLATFORM_RK3368
     rk_3368_set_cpu();
+#endif
+#ifdef TARGET_BOARD_PLATFORM_RK312x
+    rk_312x_set_cpu();
 #endif
 #endif
     rk_parse_cpu();
