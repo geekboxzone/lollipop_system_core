@@ -1034,12 +1034,34 @@ static void selinux_initialize(void)
     }
 
     INFO("loading selinux policy\n");
+#ifdef USER_PTEST
+   if(!strcmp(bootmode, "ptest")){
+
+	if (selinux_android_load_policy_rk(3) < 0) {
+        	ERROR("SELinux: Failed to load policy; rebooting into recovery mode\n");
+        	android_reboot(ANDROID_RB_RESTART2, 0, "recovery");
+        	while (1) { pause(); }  // never reached
+   	 }
+
+
+    }else{
+
+    	if (selinux_android_load_policy() < 0) {
+        	ERROR("SELinux: Failed to load policy; rebooting into recovery mode\n");
+        	android_reboot(ANDROID_RB_RESTART2, 0, "recovery");
+       		 while (1) { pause(); }  // never reached
+   	 }
+    }
+#else
+
     if (selinux_android_load_policy() < 0) {
-        ERROR("SELinux: Failed to load policy; rebooting into recovery mode\n");
+	ERROR("SELinux: Failed to load policy; rebooting into recovery mode\n");
         android_reboot(ANDROID_RB_RESTART2, 0, "recovery");
         while (1) { pause(); }  // never reached
-    }
+     }
 
+
+#endif
     selinux_init_all_handles();
     bool is_enforcing = selinux_is_enforcing();
     INFO("SELinux: security_setenforce(%d)\n", is_enforcing);

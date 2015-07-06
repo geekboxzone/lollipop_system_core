@@ -47,7 +47,9 @@ endif
 ifeq ($(BUILD_WITH_NAND_EMMC),true)
 LOCAL_CFLAGS += -DNAND_EMMC
 endif
-
+ifeq ($(strip $(BUILD_WITH_USER_PTEST)),true)
+LOCAL_CFLAGS += -DUSER_PTEST
+endif
 LOCAL_MODULE:= init
 
 LOCAL_FORCE_STATIC_EXECUTABLE := true
