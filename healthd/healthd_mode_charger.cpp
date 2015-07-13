@@ -84,6 +84,7 @@ struct key_state {
 };
 
 struct frame {
+    const char *name;
     int disp_time;
     int min_capacity;
     bool level_only;
@@ -120,36 +121,42 @@ struct charger {
 
 static struct frame batt_anim_frames[] = {
     {
+        .name = "charger/battery_0",
         .disp_time = 750,
         .min_capacity = 0,
         .level_only = false,
         .surface = NULL,
     },
     {
+        .name = "charger/battery_1",
         .disp_time = 750,
         .min_capacity = 20,
         .level_only = false,
         .surface = NULL,
     },
     {
+        .name = "charger/battery_2",
         .disp_time = 750,
         .min_capacity = 40,
         .level_only = false,
         .surface = NULL,
     },
     {
+        .name = "charger/battery_3",
         .disp_time = 750,
         .min_capacity = 60,
         .level_only = false,
         .surface = NULL,
     },
     {
+        .name = "charger/battery_4",
         .disp_time = 750,
         .min_capacity = 80,
         .level_only = true,
         .surface = NULL,
     },
     {
+        .name = "charger/battery_5",
         .disp_time = 750,
         .min_capacity = BATTERY_FULL_THRESH,
         .level_only = false,
@@ -309,8 +316,8 @@ static void draw_battery(struct charger *charger)
 
     if (batt_anim->num_frames != 0) {
         draw_surface_centered(charger, frame->surface);
-        LOGV("drawing frame #%d min_cap=%d time=%d\n",
-             batt_anim->cur_frame, frame->min_capacity,
+        LOGV("drawing frame #%d name=%s min_cap=%d time=%d\n",
+             batt_anim->cur_frame, frame->name, frame->min_capacity,
              frame->disp_time);
     }
 }
@@ -687,21 +694,16 @@ void healthd_mode_charger_init(struct healthd_config* config)
 
     charger->batt_anim = &battery_animation;
 
-    gr_surface* scale_frames;
-    int scale_count;
-    ret = res_create_multi_display_surface("charger/battery_scale", &scale_count, &scale_frames);
-    if (ret < 0) {
-        LOGE("Cannot load battery_scale image\n");
-        charger->batt_anim->num_frames = 0;
-        charger->batt_anim->num_cycles = 1;
-    } else if (scale_count != charger->batt_anim->num_frames) {
-        LOGE("battery_scale image has unexpected frame count (%d, expected %d)\n",
-             scale_count, charger->batt_anim->num_frames);
-        charger->batt_anim->num_frames = 0;
-        charger->batt_anim->num_cycles = 1;
-    } else {
-        for (i = 0; i < charger->batt_anim->num_frames; i++) {
-            charger->batt_anim->frames[i].surface = scale_frames[i];
+    for (i = 0; i < charger->batt_anim->num_frames; i++) {
+        struct frame *frame = &charger->batt_anim->frames[i];
+
+        ret = res_create_display_surface(frame->name, &frame->surface);
+        if (ret < 0) {
+            LOGE("Cannot load image %s\n", frame->name);
+            /* TODO: free the already allocated surfaces... */
+            charger->batt_anim->num_frames = 0;
+            charger->batt_anim->num_cycles = 1;
+            break;
         }
     }
 
