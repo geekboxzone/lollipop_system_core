@@ -762,6 +762,8 @@ static void sysmlink_nand_emmc_fstab()
 {
     char fstab_path[255] = "/fstab.";
     char fstab_default_path[50] = "/fstab.";
+    char recovery_fstab_path[255] = "/etc/recovery.fstab";
+    char recovery_fstab_default_path[50] = "/etc/recovery.fstab";
     int ret = -1;
 
     strcat(fstab_path, hardware);
@@ -770,8 +772,10 @@ static void sysmlink_nand_emmc_fstab()
     FILE *fp;
     if (!(fp = fopen("/proc/nand", "r"))) {
         strcat(fstab_path,"_emmc");
+        strcat(recovery_fstab_path,"_emmc");
     }else{
         strcat(fstab_path,"_nand");
+        strcat(recovery_fstab_path,"_nand");
     }
 
 
@@ -779,6 +783,13 @@ static void sysmlink_nand_emmc_fstab()
     if (ret < 0) {
 	ERROR("%s : failed", __func__);
     }
+
+#ifdef TARGET_BOARD_PLATFORM_SOFIA3GR
+    ret = symlink(recovery_fstab_path, recovery_fstab_default_path);
+    if (ret < 0) {
+	ERROR("%s : failed", __func__);
+    }
+#endif
 
 }
 static void export_kernel_boot_props(void)
