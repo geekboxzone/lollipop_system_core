@@ -138,7 +138,7 @@ static void healthd_mode_nop_battery_update(
 int healthd_register_event(int fd, void (*handler)(uint32_t)) {
     struct epoll_event ev;
 
-    ev.events = EPOLLIN | EPOLLWAKEUP;
+    ev.events = EPOLLIN;
     ev.data.ptr = (void *)handler;
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev) == -1) {
         KLOG_ERROR(LOG_TAG,
