@@ -269,7 +269,7 @@ static int draw_text(const char *str, int x, int y)
         x = (gr_fb_width() - str_len_px) / 2;
     if (y < 0)
         y = (gr_fb_height() - char_height) / 2;
-    gr_text(x, y, str, 0);
+    gr_text(x, y, str, 1);
 
     return y + char_height;
 }
@@ -279,8 +279,25 @@ static void android_green(void)
     gr_color(0xa4, 0xc6, 0x39, 255);
 }
 
+static int draw_charger_capacity(struct charger *charger, int x, int y, int w)
+{
+    int clen;
+    int font_w;
+    char str[20] = {0};
+    struct animation *batt_anim = charger->batt_anim;
+
+    clen = snprintf(str, sizeof(str) - 1, "%d%%", batt_anim->capacity);
+    font_w = clen * gr_get_font_cwidth();
+    if (font_w < w)
+	x += (w - font_w) / 2;
+
+    gr_color(255, 255, 255, 255);
+    LOGV("drawing capacity %s xpos=%d ypos=%d\n", str, x, y);
+    return draw_text(str, x, y) + 10;
+}
+
 /* returns the last y-offset of where the surface ends */
-static int draw_surface_centered(struct charger* /*charger*/, gr_surface surface)
+static int draw_surface_centered(struct charger *charger, gr_surface surface)
 {
     int w;
     int h;
@@ -291,6 +308,9 @@ static int draw_surface_centered(struct charger* /*charger*/, gr_surface surface
     h = gr_get_height(surface);
     x = (gr_fb_width() - w) / 2 ;
     y = (gr_fb_height() - h) / 2 ;
+
+    /* drawing capacity text */
+    y = draw_charger_capacity(charger, x, y, w);
 
     LOGV("drawing surface %dx%d+%d+%d\n", w, h, x, y);
     gr_blit(surface, 0, 0, w, h, x, y);
