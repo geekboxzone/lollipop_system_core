@@ -75,7 +75,8 @@
 #define MF_FORCECRYPT   0x400
 #define MF_NOEMULATEDSD 0x800 /* no emulated sdcard daemon, sd card is the only
                                  external storage */
-#define MF_RESIZE       0x1000
+#define MF_FORMATTABLE  0x1000
+#define MF_RESIZE       0x20000
 
 #define DM_BUF_SIZE 4096
 
