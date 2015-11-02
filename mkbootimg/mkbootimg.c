@@ -61,9 +61,6 @@ int usage(void)
             "       --kernel <filename>\n"
             "       --ramdisk <filename>\n"
             "       [ --second <2ndbootloader-filename> ]\n"
-#ifdef SOFIA3GR_DOUBLE_DTB
-			"       [ --third <3ndbootloader-filename> ]\n"
-#endif
             "       [ --cmdline <kernel-commandline> ]\n"
             "       [ --board <boardname> ]\n"
             "       [ --base <address> ]\n"
@@ -105,10 +102,6 @@ int main(int argc, char **argv)
     void *ramdisk_data = 0;
     char *second_fn = 0;
     void *second_data = 0;
-#ifdef SOFIA3GR_DOUBLE_DTB
-	char *third_fn = 0;
-    void *third_data = 0;
-#endif
     char *cmdline = "";
     char *bootimg = 0;
     char *board = "";
@@ -155,13 +148,7 @@ int main(int argc, char **argv)
             ramdisk_fn = val;
         } else if(!strcmp(arg, "--second")) {
             second_fn = val;
-        }
-#ifdef SOFIA3GR_DOUBLE_DTB
-		else if(!strcmp(arg, "--third")) {
-            third_fn = val;
-        }
-#endif
-		else if(!strcmp(arg, "--cmdline")) {
+        } else if(!strcmp(arg, "--cmdline")) {
             cmdline = val;
         } else if(!strcmp(arg, "--base")) {
             base = strtoul(val, 0, 16);
@@ -207,12 +194,6 @@ int main(int argc, char **argv)
         fprintf(stderr,"error: no ramdisk image specified\n");
         return usage();
     }
-
-#ifdef SOFIA3GR_DOUBLE_DTB
-	if(third_fn == 0) {
-        fprintf(stderr,"To know: 3ndbootloader is not specified. \n");
-    }
-#endif
 
     if(strlen(board) >= BOOT_NAME_SIZE) {
         fprintf(stderr,"error: board name too large\n");
@@ -262,17 +243,6 @@ int main(int argc, char **argv)
         }
     }
 
-#ifdef SOFIA3GR_DOUBLE_DTB
-	if(third_fn) {
-        third_data = load_file(third_fn, &hdr.unused[0]);
-        if(third_data == 0) {
-            fprintf(stderr,"error: could not load thirdstage '%s'\n", third_fn);
-            return 1;
-        }
-    }
-#endif
-
-
     /* put a hash of the contents in the header so boot images can be
      * differentiated based on their first 2k.
      */
@@ -283,10 +253,6 @@ int main(int argc, char **argv)
     SHA_update(&ctx, &hdr.ramdisk_size, sizeof(hdr.ramdisk_size));
     SHA_update(&ctx, second_data, hdr.second_size);
     SHA_update(&ctx, &hdr.second_size, sizeof(hdr.second_size));
-#ifdef SOFIA3GR_DOUBLE_DTB
-	SHA_update(&ctx, third_data, hdr.unused[0]);
-    SHA_update(&ctx, &hdr.unused[0], sizeof(hdr.unused[0]));
-#endif
 #if TARGET_ROCKCHIP_RECOVERY == true
     SHA_update(&ctx, &hdr.tags_addr, sizeof(hdr.tags_addr));
     SHA_update(&ctx, &hdr.page_size, sizeof(hdr.page_size));
@@ -317,15 +283,6 @@ int main(int argc, char **argv)
         if(write(fd, second_data, hdr.second_size) != (ssize_t) hdr.second_size) goto fail;
         if(write_padding(fd, pagesize, hdr.second_size)) goto fail;
     }
-
-#ifdef SOFIA3GR_DOUBLE_DTB
-	if(third_data) {
-		fprintf(stderr,"Pack 3ndbootloader\n");
-        if(write(fd, third_data, hdr.unused[0]) != (ssize_t) hdr.unused[0]) goto fail;
-        if(write_padding(fd, pagesize, hdr.unused[0])) goto fail;
-    }
-#endif
-
 
     return 0;
 

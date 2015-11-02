@@ -14,10 +14,6 @@ else
 LOCAL_CFLAGS := -DTARGET_ROCKCHIP_RECOVERY=false
 endif
 
-ifeq ($(strip $(TARGET_BOARD_PLATFORM)), sofia3gr)
-LOCAL_CFLAGS += -DSOFIA3GR_DOUBLE_DTB
-endif
-
 include $(BUILD_HOST_EXECUTABLE)
 
 $(call dist-for-goals,dist_files,$(LOCAL_BUILT_MODULE))
