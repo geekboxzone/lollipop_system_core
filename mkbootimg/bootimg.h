@@ -49,6 +49,10 @@ struct boot_img_hdr
 
     unsigned id[8]; /* timestamp / checksum / sha1 / etc */
 
+    unsigned unused2[3];    /* future expansion: should be 0 */
+    unsigned sha_ext_flag;  /* sha 256 or sha 512*/
+    unsigned sha_ext[16];   /* sha 256 or sha 512*/
+
     /* Supplemental command line data; kept here to maintain
      * binary compatibility with older versions of mkbootimg */
     unsigned char extra_cmdline[BOOT_EXTRA_ARGS_SIZE];
